@@ -1,0 +1,14 @@
+pragma silverscript ^0.1.0;
+
+// Lock tKAS. The holder redeems the full locked amount to their own key.
+// The miner fee is another input. This script has no second entry.
+contract KusdtLock(pubkey holder) {
+    entry redeem(sig holderSig) {
+        require(checkSig(holderSig, holder));
+
+        int locked = tx.inputs[this.activeInputIndex].value;
+        byte[36] holderLock = new ScriptPubKeyP2PK(holder);
+        require(tx.outputs[0].scriptPubKey == byte[](holderLock));
+        require(tx.outputs[0].value == locked);
+    }
+}
